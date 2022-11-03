@@ -52,7 +52,7 @@ def open_editting_window():
         def add():
             top = Toplevel()
             top.title("add new card")
-            question_dict = {"top":0, "bottom":0, "n":0, "q":0, "EF":2.5, "y":1}
+            question_dict = {"top":0, "bottom":0, "n":0, "q":0, "EF":2.5, "I":1}
             top1 = Label(top, text = "Enter the question here")
             q = Entry(top, width = 25)
             bottom = Label(top, text = "Enter the answer here")
@@ -103,9 +103,65 @@ def open_editting_window():
     my_button.pack()
 
 def study_mode():
-    pass
+    top = Toplevel()
+    top.title("Study a flashcard set")
+    my_label = Label(top, text = "Which set would you like to study?")
+    my_label.pack()
+    my_listbox = Listbox(top)
+    x = master_dict.keys()
+    for i in x:
+        my_listbox.insert(END, i)
+    my_listbox.pack()
+    def select_f(label):
+        label.pack_forget()
+        my_listbox.pack_forget()
+        my_button.pack_forget()
+        f_set = my_listbox.get(ANCHOR)
+        top.title(f_set)
+        flashcards = master_dict[f_set]
+        sorted_flashcards = sorted(flashcards,key = lambda x: x['I'],reverse = False)
+        def algorithm(n, q, EF, I):
+            if q >= 3:
+                if n == 0:
+                    I = 1
+                elif n == 1:
+                    I = 6
+                else:
+                    I = math.ceil(I * EF)
+                n += 1
+            else:
+                n = 0
+                I = 1
 
-myButton1 = Button(root,text="Study flashcards", height = 5, width = 25)
+            EF = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
+            if EF < 1.3:
+                EF = 1.3
+        for i in sorted_flashcards:
+            my_listbox.pack_forget()
+            t = i['top']
+            my_label = Label(top, text = t)
+            my_label.pack()
+            def answer():
+                my_label.pack_forget()
+                button2.pack_forget()
+                label1 = Label(top, text = "Answer: ")
+                label1.pack()
+                label2 = Label(top,text = i['bottom'])
+                label2.pack()
+                def next_q():
+                    pass
+                button3 = Button(top, text = "Next question", command = next_q)
+                button3.pack()
+            button2 = Button(top, text = "Answer", command = answer)
+            button2.pack()
+            
+    
+    function_with_arg = partial(select_f, my_label)
+    my_button = Button(top, text = "Select", command = function_with_arg)
+    my_button.pack()
+        
+
+myButton1 = Button(root,text="Study flashcards", height = 5, width = 25, command = study_mode)
 myButton2 = Button(root, text = "Create new flashcard set", height = 5, width = 25, command = open_making_window)
 myButton3 = Button(root, text = "Edit flashcard set", height = 5, width = 25, command = open_editting_window)
 
